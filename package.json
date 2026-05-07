@@ -1,8 +1,8 @@
 {
-  "name": "defender-xdr-powerbi-healthhub",
+  "name": "agentic-exposure-secure-score-management-tool",
   "version": "1.0.0",
   "private": true,
-  "description": "Standalone API pipeline for Microsoft Defender XDR and Secure Score data feeding Power BI dashboards",
+  "description": "Agentic Exposure and Secure Score Management Tool for Defender XDR, Graph Secure Score, approvals, and governed orchestration",
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
@@ -16,6 +16,7 @@
     "deploy:client": "powershell -ExecutionPolicy Bypass -File .\\scripts\\Deploy-HealthHubClient.ps1"
   },
   "dependencies": {
+    "@azure/storage-blob": "^12.27.0",
     "axios": "^1.9.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",

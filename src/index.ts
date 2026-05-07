@@ -7,14 +7,14 @@ const start = async (): Promise<void> => {
   const runOnce = process.argv.includes("--once");
 
   if (runOnce) {
-    await runtime.pipelineService.refresh("one-shot-cli");
+    await runtime.orchestratorService.executeRefresh("one-shot-cli", "System", "cli");
     logger.info("One-time refresh completed successfully");
     return;
   }
 
   if (!runtime.pipelineService.getLatestSnapshot()) {
     try {
-      await runtime.pipelineService.refresh("startup");
+      await runtime.orchestratorService.executeRefresh("startup", "System", "startup");
     } catch (error) {
       logger.warn({ error }, "Startup refresh failed; API will run with no snapshot until next refresh");
     }
@@ -23,7 +23,7 @@ const start = async (): Promise<void> => {
   runtime.startScheduler();
 
   const server = runtime.app.listen(config.appPort, () => {
-    logger.info({ port: config.appPort }, "Defender XDR Power BI Health Hub API is listening");
+    logger.info({ port: config.appPort }, "Agentic Exposure and Secure Score Management Tool API is listening");
   });
 
   const shutdown = (signal: string): void => {

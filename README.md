@@ -1,6 +1,6 @@
-# Defender XDR Power BI Health Hub
+# Agentic Exposure and Secure Score Management Tool
 
-Standalone service that centralizes Microsoft Defender XDR Vulnerability Management, Microsoft Secure Score, and Cloud Secure Score data into a Power BI-ready API and export pipeline.
+Standalone service that centralizes Microsoft Defender XDR Vulnerability Management, Microsoft Secure Score, and Cloud Secure Score data into a Power BI-ready API and governed agentic orchestration pipeline.
 
 ## Application Purpose
 
@@ -25,14 +25,18 @@ This repository exists to give customers a single IT security health dashboard s
 3. Data normalization across different API payload shapes.
 4. Recommendation enrichment from MCP bridge providers.
 5. Snapshot persistence and JSON table exports.
-6. REST endpoints for Power BI and monitoring.
+6. Guardrailed execution with policy checks, timeout limits, and token budgets.
+7. Approval workflows (Teams webhook plus API fallback) for sensitive refresh actions.
+8. Auditable event trail with strict PII masking and optional Azure Blob archival.
+9. Sentinel bi-directional orchestration support for incident-triggered actions.
+10. REST endpoints for Power BI, control-plane operations, and monitoring.
 
 ## Repository Layout
 
 - src/clients: OAuth, Defender API, and Graph API clients
-- src/services: Normalization, pipeline orchestration, snapshot store, Power BI export
+- src/services: Normalization, pipeline orchestration, snapshot store, Power BI export, approvals, audit, RBAC, guardrail orchestration
 - src/remediation: MCP bridge client and recommendation aggregator
-- src/routes: Health and Power BI endpoints
+- src/routes: Health, Power BI, harness controls, approvals, and Sentinel integration endpoints
 - scripts: PowerShell automation for Windows service and Entra enterprise app registration
 - powerbi: Power Query starter script
 - data: Generated snapshots and exported JSON tables
@@ -170,6 +174,11 @@ Service-related optional variables:
 
 - MCP_BRIDGE_URL and MCP_BRIDGE_API_KEY
 - POWERBI_PUSH_DATASET_URL and POWERBI_PUSH_BEARER_TOKEN
+- PII_MASKING_SALT and RETENTION_YEARS
+- ENFORCE_US_RESIDENCY, AZURE_BLOB_CONNECTION_STRING, AZURE_BLOB_CONTAINER, AZURE_BLOB_REGION
+- APPROVAL_TTL_MINUTES, TEAMS_APPROVAL_WEBHOOK_URL, REQUIRE_SENSITIVE_APPROVAL
+- SENTINEL_BIDIRECTIONAL_ENABLED, SENTINEL_INBOUND_SECRET, SENTINEL_OUTBOUND_WEBHOOK_URL
+- HARNESS_MAX_LOOP_ITERATIONS, HARNESS_MAX_EXTERNAL_CALLS, HARNESS_EXECUTION_TIMEOUT_MS, HARNESS_TOKEN_BUDGET
 
 ### 4) Install and validate
 
@@ -276,6 +285,15 @@ Operational endpoints:
 - GET /api/health
 - POST /api/admin/refresh
 
+Harness and approval endpoints:
+
+- GET /api/harness/status
+- POST /api/harness/refresh
+- GET /api/approvals/pending
+- POST /api/approvals/:approvalId/approve
+- POST /api/approvals/:approvalId/reject
+- POST /api/sentinel/incident
+
 ## Troubleshooting Runbook
 
 ## Symptom: OAuth token errors (400 or 401)
@@ -320,6 +338,15 @@ Checks:
 1. Validate REFRESH_CRON expression format.
 2. Review startup logs for cron validation errors.
 3. Verify service process stays alive in production host.
+
+## Symptom: Approval requests are not reaching reviewers
+
+Checks:
+
+1. Verify TEAMS_APPROVAL_WEBHOOK_URL is set and reachable.
+2. Validate APPROVAL_TTL_MINUTES is long enough for approver workflow.
+3. Check GET /api/approvals/pending for pending requests.
+4. Confirm caller sends x-user-role and x-user-id headers for approval actions.
 
 ## Symptom: Windows service fails to start
 
@@ -378,7 +405,7 @@ To publish to GitHub:
 
 ```powershell
 git add .
-git commit -m "Initial commit: Defender XDR Power BI Health Hub"
+git commit -m "Initial commit: Agentic Exposure and Secure Score Management Tool"
 git remote add origin <your-new-repo-url>
 git push -u origin main
 ```
@@ -387,4 +414,4 @@ git push -u origin main
 
 - The pipeline is designed to survive partial source failures and still produce a snapshot.
 - Error logs are sanitized to avoid leaking secrets.
-- This repository is separate from BP-API-integration.
+- This repository is separate from BP-API-integration and intended to be published as a standalone customer-deliverable application.
